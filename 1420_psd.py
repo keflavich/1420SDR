@@ -88,11 +88,15 @@ def main(argv):
     ax.get_xaxis().get_major_formatter().set_useOffset(False)
     ax.set_xlabel('Relative Velocity (km/s)')
     ax.set_ylabel('Measured Power (dB)')
-    fig.savefig('psd_' + str(datetime.datetime.now()) + '.pdf')
+    now = str(datetime.datetime.now().strftime("%y%m%d_%H%M%S"))
+    try:
+        fig.savefig('psd_' + now + '.pdf')
+    except:
+        print("FAILED savefig")
 
     # write csv
 
-    with open('psd_' + str(datetime.datetime.now()) + '.csv', 'w') as csvfile:
+    with open('psd_' + now + '.csv', 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         for i in range(numsamples):
             writer.writerow([frequency[i], 10*np.log10(avgpower[i]), rvel[i]])

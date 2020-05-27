@@ -31,6 +31,7 @@ def main(argv):
             else:
                 sys.exit("Error: argument must be an integer number of seconds")
 
+    opts = dict(opts)
     if '--background' in opts:
         filesuffix = '_background'
     else:
@@ -45,6 +46,9 @@ def main(argv):
         verbose = True
     else:
         verbose = False
+
+    if verbose:
+        print(opts)
 
 
 

@@ -81,7 +81,7 @@ def main(argv):
             avg_i += power[jj][ii]
         avgpower.append(avg_i/passes)
 
-    rvel = (constants.c*((hi_restfreq - frequency)/hi_restfreq)).to(u.km/u.s).value
+    rvel = (constants.c*((hi_restfreq - u.Quantity(frequency, u.MHz)/hi_restfreq)).to(u.km/u.s).value
 
     print('Writing output files...')
     # write plot

@@ -145,7 +145,6 @@ def main(argv):
 
                 ps = np.abs(np.fft.fft(samples))**2
 
-
                 ps[0] = np.mean(ps)
 
                 n = len(samples)

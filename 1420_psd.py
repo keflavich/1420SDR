@@ -17,7 +17,9 @@ def main(argv):
         sys.exit("Usage:\n1420_psd.py -i <integration time(s)>")
     try:
         opts, args = getopt.getopt(argv, "hi:", ["integrate=", "background",
-            "do_fsw", "doplot", "verbose", "device_index=", "progressbar"])
+                                                 "do_fsw", "doplot", "verbose",
+                                                 "device_index=",
+                                                 "progressbar", "freqcorr="])
     except getopt.GetoptError:
         print('Usage:\n1420_psd.py -i <integration time (s)> (--background)')
         sys.exit(2)
@@ -71,6 +73,11 @@ def main(argv):
     else:
         device_index = 0
 
+    if '--freqcorr' in opts:
+        freqcorr = int(opts['--freqcorr'])
+    else:
+        freqcorr = None
+
     if verbose:
         print(opts)
 
@@ -83,7 +90,6 @@ def main(argv):
     # initialize SDR
     sdr = RtlSdr(device_index=device_index)
 
-    #freqcorr = 55
 
     if do_fsw:
         freqthrow = ((velthrow/constants.c) * hi_restfreq).to(u.Hz).value
@@ -93,17 +99,19 @@ def main(argv):
     sdr.center_freq = hi_restfreq.to(u.Hz).value
     # max gain is ~50?
     sdr.gain = 50
-    #sdr.set_freq_correction(freqcorr)
+
+    if freqcorr is not None:
+        sdr.set_freq_correction(freqcorr)
 
     numsamples = 2048
     passes = int(int_time * sdr.rs / numsamples)
 
     if do_fsw:
         nfsw = 4
-        fsw_time = int_time / nfsw
+        #fsw_time = int_time / nfsw
 
-    chanwidth = sdr.rs / numsamples
-    chanwidth_kms = (chanwidth / sdr.center_freq) * constants.c.to(u.km/u.s).value
+    #chanwidth = sdr.rs / numsamples
+    #chanwidth_kms = (chanwidth / sdr.center_freq) * constants.c.to(u.km/u.s).value
 
 
     if verbose:
@@ -162,12 +170,11 @@ def main(argv):
     if do_fsw:
         avgpower = {key: np.array(pow).mean(axis=0) for key, pow in power.items()}
 
-        #resamp = np.interp(frequency[-1], frequency[1], avgpower[1], right=np.nan, left=np.nan)
-
-        #fsw = avgpower[-1] - resamp
+        # fsw = low-frequency minus high frequency
         fsw = avgpower[-1] - avgpower[1]
 
-        rvel = (constants.c*((hi_restfreq - u.Quantity(frequency[-1], u.Hz))/hi_restfreq)).to(u.km/u.s).value
+        # radio velocity = (nu_0 - nu) / nu_0
+        rvel1 = (constants.c*((hi_restfreq - u.Quantity(frequency[-1], u.Hz))/hi_restfreq)).to(u.km/u.s).value
         rvel2 = (constants.c*((hi_restfreq - u.Quantity(frequency[1], u.Hz))/hi_restfreq)).to(u.km/u.s).value
     else:
         avgpower = np.array(power).mean(axis=0)
@@ -201,8 +208,8 @@ def main(argv):
                'freq2': frequency[1],
                'power1': avgpower[-1],
                'power2': avgpower[1],
-               'fsw_rvel': rvel,
-               'fsw_rvel_neg': rvel2,
+               'fsw_rvel1': rvel1,
+               'fsw_rvel2': rvel2,
                'fsw_pow': fsw}
     else:
         filename = f"psd_{now}_tint{int_time}s_sdr{device_index}{filesuffix}.fits"

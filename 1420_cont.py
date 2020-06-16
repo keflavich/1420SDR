@@ -27,7 +27,7 @@ class sdrWorker(QThread):
     global times
     global powers
     global running
-    
+
     def __init__(self):
         QThread.__init__(self)
 
@@ -45,7 +45,7 @@ class sdrWorker(QThread):
         # begin reading samples from SDR
 
         samples = astroSDR.sdr.read_samples(256*1024)
-        
+
         n = len(samples)
         frq = np.fft.fftfreq(n)
         idx = np.argsort(frq)
@@ -61,12 +61,12 @@ class sdrWorker(QThread):
         power[np.argmax(power)] = np.mean(power)
 
         # get peak frequency data
-        
+
         peak_freq = freq[np.argmax(power)]
         powersum = np.sum(power)
 
         # append values to output arrays
-        
+
         times.append(datetime.datetime.now())
         powers.append(10*np.log10(powersum))
 
@@ -81,19 +81,19 @@ class astroSDR(QtGui.QMainWindow, Ui_MainWindow):
     global times
 
     # set SDR parameters
-    
+
     try:
         sdr = RtlSdr()
     except:
         sys.exit('Error: RTL-SDR not found')
-        
+
     sdr.sample_rate = 2.4e6
     sdr.center_freq = 1420.405751786e6
     sdr.gain = 50
     sdr.set_freq_correction(55)
-    
+
     def __init__(self):
-        
+
         super(self.__class__, self).__init__()
         self.setupUi(self)
         self.setWindowTitle('1420.4 MHz Hydrogen Line Continuum Power')
@@ -107,7 +107,7 @@ class astroSDR(QtGui.QMainWindow, Ui_MainWindow):
         self.timeIntervalMS = 100
         self.time = 0
         self.matplotlibwidget.draw()
-        
+
         self.startButton.clicked.connect(self.captureSDR)
         self.CSVButton.clicked.connect(self.writeToCSV)
         self.PDFButton.clicked.connect(self.writePlot)
@@ -129,30 +129,30 @@ class astroSDR(QtGui.QMainWindow, Ui_MainWindow):
             self.sdr.set_freq_correction(self.offsetBox.value())
         self.mySDRWorker.daemon = True
         QtCore.QMetaObject.invokeMethod(self.mySDRWorker, 'run', Qt.QueuedConnection,)
-        
+
         self.stopButton.setEnabled(True)
         self.stopButton.clicked.connect(self.stop)
         self.startButton.setEnabled(False)
         self.CSVButton.setEnabled(False)
         self.PDFButton.setEnabled(False)
-        
+
         self.mySDRWorker.moveToThread(self.threadInstance)
         self.threadInstance.start()
 
     def updateVals(self):
         self.powerLabel.setText('Measured Power: ' + str(powers[len(powers)-1]) + ' dB')
-        
+
     def updatePlot(self):
-        
+
         self.matplotlibwidget.axes.plot(times, powers, 'r-')
         self.matplotlibwidget.axes.xaxis.set_major_formatter(DateFormatter('%H:%M:%S'))
         self.matplotlibwidget.axes.tick_params(labelsize=6)
         self.matplotlibwidget.axes.get_yaxis().get_major_formatter().set_useOffset(False)
         self.matplotlibwidget.axes.set_xlabel('Local Time')
         self.matplotlibwidget.axes.set_ylabel('Continuum Power (dB)')
-            
+
         self.matplotlibwidget.draw()
-                
+
     def stop(self):
         global running
         running = False
@@ -169,9 +169,9 @@ class astroSDR(QtGui.QMainWindow, Ui_MainWindow):
         running = False
         self.threadInstance.wait(100)
         self.threadInstance.quit()
-        
+
     def clearData(self):
-        
+
         del times[:]
         del powers[:]
 
@@ -179,7 +179,7 @@ class astroSDR(QtGui.QMainWindow, Ui_MainWindow):
         self.CSVButton.setEnabled(False)
         self.PDFButton.setEnabled(False)
         self.updatePlot()
-        
+
     def writeToCSV(self):
 
         with open('mapper_output_' + str(datetime.datetime.now()) + '.csv', 'w') as csvfile:
@@ -204,8 +204,8 @@ class astroSDR(QtGui.QMainWindow, Ui_MainWindow):
         running = False
         self.threadInstance.wait(100)
         self.threadInstance.quit()
-    
-        
+
+
 if __name__ == '__main__':
     import sys
     app = QtGui.QApplication(sys.argv)

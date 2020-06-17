@@ -1,6 +1,5 @@
 # James Cheshire
-# Last modified 5/11/17
-# frequency dropoffs: (approx.) index 416 for redshift, 1631 for blueshift
+# Modified by Adam Ginsburg
 
 import pylab as plt
 from rtlsdr import RtlSdr
@@ -19,7 +18,12 @@ def main(argv):
         opts, args = getopt.getopt(argv, "hi:", ["integrate=", "background",
                                                  "do_fsw", "doplot", "verbose",
                                                  "device_index=",
-                                                 "progressbar", "freqcorr="])
+                                                 "progressbar", "freqcorr=",
+                                                 "obs_lat",
+                                                 "obs_lon",
+                                                 "altitude",
+                                                 "azimuth",
+                                                ])
     except getopt.GetoptError:
         print('Usage:\n1420_psd.py -i <integration time (s)> (--background)')
         sys.exit(2)
@@ -222,6 +226,10 @@ def main(argv):
     if verbose:
         print(filename)
 
+    for key in ('obs_lat', 'obs_lon', 'altitude', 'azimuth'):
+        if f'--{key}' in opts:
+            tbl.meta[f'--{key}'] = opts['f'--{key}']
+        
     tbl.meta['date-obs'] = now
     tbl.write(filename)
 

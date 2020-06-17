@@ -19,10 +19,10 @@ def main(argv):
                                                  "do_fsw", "doplot", "verbose",
                                                  "device_index=",
                                                  "progressbar", "freqcorr=",
-                                                 "obs_lat",
-                                                 "obs_lon",
-                                                 "altitude",
-                                                 "azimuth",
+                                                 "obs_lat=",
+                                                 "obs_lon=",
+                                                 "altitude=",
+                                                 "azimuth=",
                                                 ])
     except getopt.GetoptError:
         print('Usage:\n1420_psd.py -i <integration time (s)> (--background)')
@@ -179,6 +179,7 @@ def main(argv):
         # radio velocity = (nu_0 - nu) / nu_0
         rvel1 = (constants.c*((hi_restfreq - u.Quantity(frequency[-1], u.Hz))/hi_restfreq)).to(u.km/u.s).value
         rvel2 = (constants.c*((hi_restfreq - u.Quantity(frequency[1], u.Hz))/hi_restfreq)).to(u.km/u.s).value
+        rvel = rvel1
     else:
         avgpower = np.array(power).mean(axis=0)
         rvel = (constants.c*((hi_restfreq - u.Quantity(frequency, u.Hz))/hi_restfreq)).to(u.km/u.s).value

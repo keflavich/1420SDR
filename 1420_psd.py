@@ -228,7 +228,7 @@ def main(argv):
 
     for key in ('obs_lat', 'obs_lon', 'altitude', 'azimuth'):
         if f'--{key}' in opts:
-            tbl.meta[f'--{key}'] = opts['f'--{key}']
+            tbl.meta[f'--{key}'] = opts[f'--{key}']
         
     tbl.meta['date-obs'] = now
     tbl.write(filename)

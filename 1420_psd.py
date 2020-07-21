@@ -7,6 +7,7 @@ import datetime, csv, sys, numpy as np, getopt
 from astropy import constants, units as u
 from astropy.table import Table
 import tqdm
+import time
 
 hi_restfreq = 1420.405751786*u.MHz
 
@@ -139,11 +140,14 @@ def main(argv):
     if verbose:
         print('Warning: expect execution to take 4-5x your integration time')
         print('Collecting Data...')
-
+    
+    time.sleep(0.05) # try to prevent 'pll not locked' errors by adding inter-operation delays
+        
     if do_fsw:
         for fsw_id in progressbar(range(nfsw)):
 
             sdr.center_freq = hi_restfreq.to(u.Hz).value + freqthrow * sign
+            time.sleep(0.01) # try to prevent 'pll not locked' errors by adding inter-operation delays
             sign = sign * -1
 
             frq = np.fft.fftfreq(numsamples)

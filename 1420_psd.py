@@ -97,6 +97,8 @@ def main(argv):
 
     if do_fsw:
         freqthrow = ((velthrow/constants.c) * hi_restfreq).to(u.Hz).value
+        if verbose:
+            print(f"velthrow={velthrow}, freqthrow={freqthrow}")
 
     sdr.sample_rate = 2.4e6
     # center frequency in Hertz
@@ -105,6 +107,8 @@ def main(argv):
     sdr.gain = 50
 
     if freqcorr is not None:
+        if verbose:
+            print(f"setting freqcorr={freqcorr}")
         sdr.set_freq_correction(freqcorr)
 
     numsamples = 2048
@@ -119,7 +123,7 @@ def main(argv):
 
 
     if verbose:
-        print(f"Center freq: {sdr.fc}  readsize: {sdr.fc}  numsamples: {numsamples} passes: {passes}")
+        print(f"Center freq: {sdr.fc}  readsize: {sdr.fc}  numsamples: {numsamples} passes: {passes}  do_fsw={do_fsw}")
 
     # collect data
 

@@ -38,8 +38,6 @@ def main(argv):
                 int_time = int(arg)
                 if(int_time <= 0):
                     sys.exit("Integration time must be a positive integer number of seconds")
-                elif verbose:
-                    print(f"int_time={int_time}")
             else:
                 sys.exit("Error: argument must be an integer number of seconds")
 

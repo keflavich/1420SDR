@@ -143,8 +143,13 @@ def main(argv):
         
     if do_fsw:
         for fsw_id in progressbar(range(nfsw)):
+            cfreq_target = hi_restfreq.to(u.Hz).value + freqthrow * sign
+            if verbose:
+                print(f"For fswd_id={fsw_id}, cfreq={cfreq_target}")
 
-            sdr.center_freq = hi_restfreq.to(u.Hz).value + freqthrow * sign
+            sdr.center_freq = cfreq_target
+            if verbose:
+                print(f"Set center_freq={sdr.center_freq}")
             time.sleep(0.01) # try to prevent 'pll not locked' errors by adding inter-operation delays
             sign = sign * -1
 

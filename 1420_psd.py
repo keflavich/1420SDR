@@ -24,6 +24,7 @@ def main(argv):
                                                  "obs_lon=",
                                                  "altitude=",
                                                  "azimuth=",
+                                                 "suffix=",
                                                 ])
     except getopt.GetoptError:
         print('Usage:\n1420_psd.py -i <integration time (s)> (--background)')
@@ -46,6 +47,11 @@ def main(argv):
         filesuffix = '_background'
     else:
         filesuffix = ""
+
+    if '--suffix' in opts:
+        suffix = str(opts['--suffix'])
+    else:
+        suffix = ""
 
     if "--doplot" in opts:
         doplot = True
@@ -219,7 +225,7 @@ def main(argv):
     # write csv
 
     if do_fsw:
-        filename = f"psd_{now}_tint{int_time}s_sdr{device_index}_fsw{filesuffix}.fits"
+        filename = f"psd_{now}_tint{int_time}s_sdr{device_index}_fsw{filesuffix}{suffix}.fits"
 
         dat = {'freq1': frequency[-1],
                'freq2': frequency[1],
@@ -229,7 +235,7 @@ def main(argv):
                'fsw_rvel2': rvel2,
                'fsw_pow': fsw}
     else:
-        filename = f"psd_{now}_tint{int_time}s_sdr{device_index}{filesuffix}.fits"
+        filename = f"psd_{now}_tint{int_time}s_sdr{device_index}{filesuffix}{suffix}.fits"
 
         dat = {'freq': frequency,
                'rvel': frequency,
@@ -243,7 +249,11 @@ def main(argv):
     for key in ('obs_lat', 'obs_lon', 'altitude', 'azimuth'):
         if f'--{key}' in opts:
             tbl.meta[f'--{key}'] = opts[f'--{key}']
-        
+    
+    tbl.meta['device'] = str(device_index)
+    tbl.meta['tint'] = int_time
+    tbl.meta['suffix'] = suffix
+    tbl.meta['is_bg'] = filesuffix
     tbl.meta['date-obs'] = now
     tbl.write(filename)
 

@@ -260,6 +260,10 @@ def main(argv):
     if verbose:
         print(f"total time = {time.time()-t0} for tint={int_time}")
 
+    return filename
+
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    filename = main(sys.argv[1:])
+
+    print(filename)
